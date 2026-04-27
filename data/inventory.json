@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "name": "Olive Oil",
+    "quantity": 5,
+    "par": 10,
+    "unit": "bottles",
+    "category": "Pantry",
+    "location": "Dry Storage",
+    "lastUpdated": "2026-04-20"
+  },
+  {
+    "id": 2,
+    "name": "Iodized Salt",
+    "quantity": 2,
+    "par": 10,
+    "unit": "kg",
+    "category": "Spices",
+    "location": "Dry Storage",
+    "lastUpdated": "2026-04-22"
+  },
+  {
+    "id": 3,
+    "name": "Garlic",
+    "quantity": 12,
+    "par": 10,
+    "unit": "cloves",
+    "category": "Produce",
+    "location": "Walk In",
+    "lastUpdated": "2026-04-24"
+  },
+  {
+    "id": 4,
+    "name": "Penne Pasta",
+    "quantity": 8,
+    "par": 10,
+    "unit": "boxes",
+    "category": "Pantry",
+    "location": "Dry Storage",
+    "lastUpdated": "2026-04-23"
+  },
+  {
+    "id": 5,
+    "name": "Tomatoes",
+    "quantity": 15,
+    "par": 10,
+    "unit": "cans",
+    "category": "Produce",
+    "location": "Walk In",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "id": 6,
+    "name": "Fresh Basil",
+    "quantity": 1,
+    "par": 10,
+    "unit": "bunch",
+    "category": "Herbs",
+    "location": "Walk In",
+    "lastUpdated": "2026-04-21"
+  }
+]
