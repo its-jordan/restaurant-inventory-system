@@ -100,10 +100,8 @@ export default function InventoryPage() {
     setItems((current) => current.filter((item) => item.id !== id));
 
     try {
-      await fetch(API_PATH, {
+      await fetch(`${API_PATH}?id=${id}`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
       });
     } catch (error) {
       console.error('Failed to delete item:', error);

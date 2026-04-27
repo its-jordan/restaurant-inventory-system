@@ -43,6 +43,25 @@ export default function MapPage() {
   const [draggedItem, setDraggedItem] = React.useState<InventoryItem | null>(
     null,
   );
+  const [draggedZone, setDraggedZone] = React.useState<{
+    id: string;
+    startX: number;
+    startY: number;
+    startTop: number;
+    startLeft: number;
+  } | null>(null);
+  const [resizingZone, setResizingZone] = React.useState<{
+    id: string;
+    startX: number;
+    startY: number;
+    startWidth: number;
+    startHeight: number;
+    handle: string;
+  } | null>(null);
+  const [editingZoneName, setEditingZoneName] = React.useState<string | null>(
+    null,
+  );
+  const [editingZoneNameValue, setEditingZoneNameValue] = React.useState('');
 
   React.useEffect(() => {
     async function loadItems() {
@@ -95,6 +114,18 @@ export default function MapPage() {
     window.localStorage.setItem(PLACEMENTS_KEY, JSON.stringify(placements));
   }, [placements]);
 
+  const saveZones = async (updatedZones: MapZone[]) => {
+    try {
+      await fetch(ZONES_API_PATH, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedZones),
+      });
+    } catch (error) {
+      console.error('Failed to save zones:', error);
+    }
+  };
+
   const getItemsInZone = (zoneId: string) => {
     return placements
       .filter((p) => p.zoneId === zoneId)
@@ -104,6 +135,150 @@ export default function MapPage() {
 
   const handleDragStart = (item: InventoryItem) => {
     setDraggedItem(item);
+  };
+
+  const handleZoneDragStart = (
+    e: React.MouseEvent,
+    zoneId: string,
+    zone: MapZone,
+  ) => {
+    if (editingZoneName) return;
+    const mapContainer = (e.currentTarget as HTMLElement).parentElement;
+    if (!mapContainer) return;
+
+    setDraggedZone({
+      id: zoneId,
+      startX: e.clientX,
+      startY: e.clientY,
+      startTop: zone.top,
+      startLeft: zone.left,
+    });
+  };
+
+  const handleResizeStart = (
+    e: React.MouseEvent,
+    zoneId: string,
+    zone: MapZone,
+    handle: string,
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setResizingZone({
+      id: zoneId,
+      startX: e.clientX,
+      startY: e.clientY,
+      startWidth: zone.width,
+      startHeight: zone.height,
+      handle,
+    });
+  };
+
+  React.useEffect(() => {
+    if (!draggedZone && !resizingZone) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const mapContainer = document.querySelector(
+        '.map-container',
+      ) as HTMLElement;
+      if (!mapContainer) return;
+      const mapRect = mapContainer.getBoundingClientRect();
+
+      if (draggedZone) {
+        const deltaX = e.clientX - draggedZone.startX;
+        const deltaY = e.clientY - draggedZone.startY;
+
+        const deltaPercentX = (deltaX / mapRect.width) * 100;
+        const deltaPercentY = (deltaY / mapRect.height) * 100;
+
+        const newZones = zones.map((z) =>
+          z.id === draggedZone.id
+            ? {
+                ...z,
+                top: Math.max(
+                  0,
+                  Math.min(100, draggedZone.startTop + deltaPercentY),
+                ),
+                left: Math.max(
+                  0,
+                  Math.min(100, draggedZone.startLeft + deltaPercentX),
+                ),
+              }
+            : z,
+        );
+        setZones(newZones);
+      }
+
+      if (resizingZone) {
+        const deltaX = e.clientX - resizingZone.startX;
+        const deltaY = e.clientY - resizingZone.startY;
+
+        const deltaPercentX = (deltaX / mapRect.width) * 100;
+        const deltaPercentY = (deltaY / mapRect.height) * 100;
+
+        const newZones = zones.map((z) => {
+          if (z.id !== resizingZone.id) return z;
+
+          let newWidth = resizingZone.startWidth;
+          let newHeight = resizingZone.startHeight;
+          let newLeft = z.left;
+          let newTop = z.top;
+
+          if (resizingZone.handle === 'se') {
+            newWidth = Math.max(10, resizingZone.startWidth + deltaPercentX);
+            newHeight = Math.max(10, resizingZone.startHeight + deltaPercentY);
+            // Constrain to stay within bounds
+            newWidth = Math.min(newWidth, 100 - z.left);
+            newHeight = Math.min(newHeight, 100 - z.top);
+          } else if (resizingZone.handle === 'sw') {
+            newWidth = Math.max(10, resizingZone.startWidth - deltaPercentX);
+            newHeight = Math.max(10, resizingZone.startHeight + deltaPercentY);
+            newLeft = z.left + deltaPercentX;
+            newLeft = Math.max(0, newLeft);
+            newWidth = Math.min(newWidth, 100 - newLeft);
+            newHeight = Math.min(newHeight, 100 - z.top);
+          }
+
+          return {
+            ...z,
+            width: Math.max(10, newWidth),
+            height: Math.max(10, newHeight),
+            left: Math.max(0, newLeft),
+            top: Math.max(0, newTop),
+          };
+        });
+        setZones(newZones);
+      }
+    };
+
+    const handleMouseUp = async () => {
+      if (draggedZone || resizingZone) {
+        await saveZones(zones);
+      }
+      setDraggedZone(null);
+      setResizingZone(null);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [draggedZone, resizingZone, zones]);
+
+  const handleZoneNameEdit = (zone: MapZone) => {
+    setEditingZoneName(zone.id);
+    setEditingZoneNameValue(zone.name);
+  };
+
+  const handleZoneNameSave = async (zoneId: string) => {
+    const newZones = zones.map((z) =>
+      z.id === zoneId ? { ...z, name: editingZoneNameValue } : z,
+    );
+    setZones(newZones);
+    await saveZones(newZones);
+    setEditingZoneName(null);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -152,31 +327,65 @@ export default function MapPage() {
     <div className='p-6'>
       <h1 className='text-3xl font-bold mb-2'>Kitchen Map</h1>
       <p className='mb-6 text-sm text-gray-500'>
-        Drag items from the list below onto the map to place them in zones.
+        Drag zones to move, resize from bottom-right corner to resize, click
+        name to rename. Drag items to place.
       </p>
 
       <div className='grid grid-cols-1 lg:grid-cols-4 gap-6'>
         {/* Map */}
         <div className='lg:col-span-3'>
           <div
-            className='relative w-full bg-gray-100 border-2 border-gray-300 rounded-lg overflow-hidden'
+            className='map-container relative w-full bg-gray-100 border-2 border-gray-300 rounded-lg overflow-hidden'
             style={{ aspectRatio: '16/9' }}>
             {zones.map((zone) => (
               <div
                 key={zone.id}
-                className={`absolute border-2 border-gray-400 rounded overflow-hidden ${zone.color} transition-opacity hover:opacity-80`}
+                className={`absolute border-2 border-gray-400 rounded overflow-hidden ${zone.color} transition-opacity hover:opacity-80 group`}
                 style={{
                   top: `${zone.top}%`,
                   left: `${zone.left}%`,
                   width: `${zone.width}%`,
                   height: `${zone.height}%`,
+                  cursor: draggedZone?.id === zone.id ? 'grabbing' : 'grab',
                 }}
+                onMouseDown={(e) => handleZoneDragStart(e, zone.id, zone)}
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDropOnZone(zone.id, e)}>
+                {/* Resize handles */}
+                <div
+                  className='absolute -bottom-1 -right-1 w-4 h-4 bg-gray-600 cursor-se-resize rounded-full opacity-0 group-hover:opacity-100 z-20'
+                  onMouseDown={(e) => handleResizeStart(e, zone.id, zone, 'se')}
+                />
+                <div
+                  className='absolute -bottom-1 -left-1 w-4 h-4 bg-gray-600 cursor-sw-resize rounded-full opacity-0 group-hover:opacity-100 z-20'
+                  onMouseDown={(e) => handleResizeStart(e, zone.id, zone, 'sw')}
+                />
+
                 <div className='absolute top-0 left-0 p-2 z-10'>
-                  <div className='font-semibold text-sm text-gray-700'>
-                    {zone.name}
-                  </div>
+                  {editingZoneName === zone.id ? (
+                    <input
+                      autoFocus
+                      type='text'
+                      value={editingZoneNameValue}
+                      onChange={(e) => setEditingZoneNameValue(e.target.value)}
+                      onBlur={() => handleZoneNameSave(zone.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleZoneNameSave(zone.id);
+                        if (e.key === 'Escape') setEditingZoneName(null);
+                      }}
+                      className='font-semibold text-sm text-gray-700 bg-white px-2 py-1 rounded border border-gray-300'
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  ) : (
+                    <div
+                      className='font-semibold text-sm text-gray-700 cursor-pointer hover:bg-white hover:px-2 hover:py-1 hover:rounded'
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleZoneNameEdit(zone);
+                      }}>
+                      {zone.name}
+                    </div>
+                  )}
                 </div>
                 <div className='relative w-full h-full'>
                   {getItemsInZone(zone.id).map((item) => {

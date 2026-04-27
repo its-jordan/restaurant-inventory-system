@@ -1,22 +1,26 @@
-import { readFile, writeFile } from 'fs/promises';
-import { join } from 'path';
+import { db } from '@/lib/db';
+import { zonesTable, type MapZone } from '@/lib/schema';
+import { eq } from 'drizzle-orm';
 
 export async function GET() {
   try {
-    const filePath = join(process.cwd(), 'data', 'zones.json');
-    const data = await readFile(filePath, 'utf-8');
-    return Response.json(JSON.parse(data));
+    const zones = await db.select().from(zonesTable);
+    return Response.json(zones);
   } catch (error) {
-    console.error('Failed to read zones:', error);
+    console.error('Failed to load zones:', error);
     return Response.json({ error: 'Failed to load zones' }, { status: 500 });
   }
 }
 
 export async function PUT(request: Request) {
   try {
-    const zones = await request.json();
-    const filePath = join(process.cwd(), 'data', 'zones.json');
-    await writeFile(filePath, JSON.stringify(zones, null, 2));
+    const zones = (await request.json()) as MapZone[];
+
+    // Update all zones
+    for (const zone of zones) {
+      await db.update(zonesTable).set(zone).where(eq(zonesTable.id, zone.id));
+    }
+
     return Response.json(zones);
   } catch (error) {
     console.error('Failed to update zones:', error);
