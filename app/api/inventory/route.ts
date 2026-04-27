@@ -1,6 +1,6 @@
 import { db } from '@/lib/db';
 import { inventoryTable, type InventoryItem } from '@/lib/schema';
-import { eq } from 'drizzle-orm';
+import { eq, max } from 'drizzle-orm';
 
 export async function GET() {
   try {
@@ -23,11 +23,15 @@ export async function POST(request: Request) {
     > & { lastUpdated?: string };
 
     // Get the next ID
+
     const maxIdResult = await db
-      .select({ maxId: db.sql<number>`MAX(id)` })
+      .select({
+        value: max(inventoryTable.id),
+      })
       .from(inventoryTable);
 
-    const nextId = (maxIdResult[0]?.maxId || 0) + 1;
+    const nextId = (maxIdResult[0]?.value ?? 0) + 1;
+
     const now = new Date().toISOString().split('T')[0];
 
     const newItem: InventoryItem = {

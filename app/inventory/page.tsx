@@ -220,7 +220,7 @@ export default function InventoryPage() {
       </div>
 
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-        <div className='border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow'>
+        <div className='border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow grid col-span-1 md:col-span-2 lg:col-span-3'>
           <div className='mb-4'>
             <h2 className='text-xl font-semibold'>Add New Item</h2>
             <p className='text-sm text-gray-500'>
@@ -228,7 +228,7 @@ export default function InventoryPage() {
             </p>
           </div>
 
-          <div className='space-y-3'>
+          <div className='space-y-3 grid grid-cols-1 md:grid-cols-5 lg:grid-cols-5 gap-4'>
             <label className='block text-sm'>
               Name
               <input

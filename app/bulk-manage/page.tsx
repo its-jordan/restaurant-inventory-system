@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { RiDeleteBin7Line } from 'react-icons/ri';
 
 interface InventoryItem {
   id: number;
@@ -133,6 +134,18 @@ export default function BulkManagePage() {
       ...current,
       [field]: field === 'quantity' || field === 'par' ? Number(value) : value,
     }));
+  };
+
+  const handleDelete = async (id: number) => {
+    setItems((current) => current.filter((item) => item.id !== id));
+
+    try {
+      await fetch(`${API_PATH}?id=${id}`, {
+        method: 'DELETE',
+      });
+    } catch (error) {
+      console.error('Failed to delete item:', error);
+    }
   };
 
   const handleAddItem = async () => {
@@ -378,6 +391,7 @@ export default function BulkManagePage() {
                       ? '↓'
                       : '')}
               </th>
+              <th className='cursor-pointer select-none px-3 py-3.5 hover:bg-gray-100'></th>
             </tr>
           </thead>
           <tbody className='divide-y divide-gray-200'>
@@ -443,6 +457,14 @@ export default function BulkManagePage() {
                 </td>
                 <td className='whitespace-nowrap px-3 py-3 text-gray-500'>
                   {item.lastUpdated.toLocaleDateString()}
+                </td>
+                <td className='px-3 py-3 text-right'>
+                  <button
+                    onClick={() => handleDelete(item.id)}
+                    type='button'
+                    className='hover:text-red-500 hover:cursor-pointer'>
+                    <RiDeleteBin7Line />
+                  </button>
                 </td>
               </tr>
             ))}
