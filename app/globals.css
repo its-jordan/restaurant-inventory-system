@@ -26,7 +26,7 @@
   :root {
     --background: #111111;
     --foreground: #e2e8f0;
-    --muted: #94a3b8;
+    --muted: #686868;
     --surface: #292929;
     --surface-muted: #161616;
     --modifier: #ffffff;
@@ -151,4 +151,112 @@ body {
   flex-flow: row nowrap;
   justify-content: start;
   align-items: center;
+}
+
+.bulk-item-input {
+  @apply px-2 py-1 text-sm;
+  width: 100%;
+  border: 1px solid color-mix(in srgb, var(--border), var(--modifier) 25%);
+  border-radius: 0.25rem;
+  transition:
+    outline 0.2s ease,
+    background-color 0.2s ease;
+  &:focus {
+    outline: none;
+    background-color: color-mix(
+      in srgb,
+      var(--surface),
+      var(--modifier) 25%
+    ) !important;
+  }
+}
+
+.bulk-item {
+  @apply px-3 py-3;
+}
+
+.last-updated {
+  color: var(--muted);
+}
+
+.table-header {
+  @apply px-3 py-3.5;
+  cursor: pointer;
+  user-select: none;
+  color: var(--foreground);
+  :hover {
+    background-color: color-mix(in srgb, var(--surface), var(--modifier) 5%);
+  }
+}
+
+.table-item {
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+  &:hover {
+    background-color: color-mix(in srgb, var(--surface), var(--modifier) 10%);
+    & .bulk-item-input {
+      background-color: color-mix(in srgb, var(--surface), var(--modifier) 5%);
+    }
+  }
+  &:not(:last-child) {
+    border-bottom: 1px solid
+      color-mix(in srgb, var(--border), var(--modifier) 10%);
+  }
+}
+
+.bin-icon {
+  color: var(--foreground);
+  transition: color 0.2s ease;
+  cursor: pointer;
+  &:hover {
+    color: var(--danger);
+    cursor: pointer;
+  }
+}
+.add-item-bulk {
+  @apply px-2 py-1 text-sm;
+  width: 100%;
+  background-color: color-mix(in srgb, var(--surface), var(--modifier) 25%);
+  border: 1px solid color-mix(in srgb, var(--border), var(--modifier) 25%);
+  border-radius: 0.25rem;
+  transition:
+    outline 0.2s ease,
+    background-color 0.2s ease;
+  :disabled {
+    background-color: var(--muted);
+    color: gray;
+    cursor: not-allowed;
+  }
+  :not(:disabled):hover {
+    background-color: var(--primary);
+  }
+}
+
+.reorder-grid {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 1rem;
+  justify-content: start;
+  align-items: start;
+}
+
+.reorder-item-card {
+  @apply shadow-sm;
+  display: flex;
+  flex-flow: column nowrap;
+  background-color: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--border), var(--modifier) 10%);
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  padding: 0;
+}
+
+.reorder-item-header {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: start;
+  gap: 3rem;
+  padding: 0.75rem 1rem;
 }

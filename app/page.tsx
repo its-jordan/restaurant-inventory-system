@@ -234,90 +234,85 @@ export default function Home() {
 
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
         <div className='grid col-span-1 md:col-span-2 lg:col-span-3'>
-          <div className='add-item grid grid-cols-1 md:grid-cols-5 lg:grid-cols-5 gap-4'>
-            <div className='item-header col-span-6 flex flex-row flex-nowrap justify-between items-center'>
-              <div>Create a new inventory entry.</div>
-              <div>
-                <button
-                  onClick={handleAddNewItem}
-                  className='w-full rounded bg-green-500 px-4 py-2 text-sm font-semibold text-white hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-gray-300'
-                  disabled={
-                    !newItem.name ||
-                    !newItem.unit ||
-                    !newItem.category ||
-                    !newItem.location
-                  }>
-                  Add Item
-                </button>
-              </div>
-            </div>
-            <label className='add-input'>
-              Name
+          <div className='mb-6 rounded-lg border border-gray-200 bg-white p-4 shadow-sm'>
+            <div className='grid gap-3 lg:grid-cols-7'>
               <input
                 value={newItem.name}
                 onChange={(event) =>
-                  handleNewItemChange('name', event.target.value)
+                  handleNewItemChange(
+                    'name',
+                    event.target.value.replaceAll(' ', '-').toLowerCase(),
+                  )
                 }
-                className=''
+                placeholder='Name'
+                className='bulk-item-input'
               />
-            </label>
-            <div className='quantity-container'>
-              <label className='add-input'>
-                Quantity
-                <input
-                  type='number'
-                  min='0'
-                  value={newItem.quantity}
-                  onChange={(event) =>
-                    handleNewItemChange('quantity', event.target.value)
-                  }
-                  className=''
-                />
-              </label>
-              <label className='add-input'>
-                Par
-                <input
-                  type='number'
-                  min='0'
-                  value={newItem.par}
-                  onChange={(event) =>
-                    handleNewItemChange('par', event.target.value)
-                  }
-                  className=''
-                />
-              </label>
-            </div>
-
-            <label className='add-input'>
-              Unit
+              <input
+                type='number'
+                min='0'
+                value={newItem.quantity}
+                onChange={(event) =>
+                  handleNewItemChange('quantity', event.target.value)
+                }
+                placeholder='Qty'
+                className='bulk-item-input'
+              />
+              <input
+                type='number'
+                min='0'
+                value={newItem.par}
+                onChange={(event) =>
+                  handleNewItemChange('par', event.target.value)
+                }
+                placeholder='Par'
+                className='bulk-item-input'
+              />
               <input
                 value={newItem.unit}
                 onChange={(event) =>
-                  handleNewItemChange('unit', event.target.value)
+                  handleNewItemChange(
+                    'unit',
+                    event.target.value.replaceAll(' ', '-').toLowerCase(),
+                  )
                 }
-                className=''
+                placeholder='Unit'
+                className='bulk-item-input'
               />
-            </label>
-            <label className='add-input'>
-              Category
               <input
                 value={newItem.category}
                 onChange={(event) =>
-                  handleNewItemChange('category', event.target.value)
+                  handleNewItemChange(
+                    'category',
+                    event.target.value.replaceAll(' ', '-').toLowerCase(),
+                  )
                 }
-                className=''
+                placeholder='Category'
+                className='bulk-item-input'
               />
-            </label>
-            <label className='add-input'>
-              Location
               <input
                 value={newItem.location}
                 onChange={(event) =>
-                  handleNewItemChange('location', event.target.value)
+                  handleNewItemChange(
+                    'location',
+                    event.target.value.replaceAll(' ', '-').toLowerCase(),
+                  )
                 }
-                className=''
+                placeholder='Location'
+                className='bulk-item-input'
               />
-            </label>
+              <button
+                type='button'
+                onClick={handleAddNewItem}
+                disabled={
+                  !newItem.name ||
+                  !newItem.unit ||
+                  !newItem.category ||
+                  !newItem.location
+                }
+                className='add-item-bulk'>
+                Add Item
+              </button>
+            </div>
           </div>
         </div>
 

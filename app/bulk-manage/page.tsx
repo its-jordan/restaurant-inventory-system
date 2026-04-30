@@ -241,14 +241,17 @@ export default function BulkManagePage() {
       </p>
 
       <div className='mb-6 rounded-lg border border-gray-200 bg-white p-4 shadow-sm'>
-        <div className='grid gap-3 lg:grid-cols-6'>
+        <div className='grid gap-3 lg:grid-cols-7'>
           <input
             value={newItem.name}
             onChange={(event) =>
-              handleNewItemChange('name', event.target.value)
+              handleNewItemChange(
+                'name',
+                event.target.value.replaceAll(' ', '-').toLowerCase(),
+              )
             }
             placeholder='Name'
-            className='rounded border border-gray-300 px-3 py-2 text-sm shadow-sm'
+            className='bulk-item-input'
           />
           <input
             type='number'
@@ -258,7 +261,7 @@ export default function BulkManagePage() {
               handleNewItemChange('quantity', event.target.value)
             }
             placeholder='Qty'
-            className='rounded border border-gray-300 px-3 py-2 text-sm shadow-sm'
+            className='bulk-item-input'
           />
           <input
             type='number'
@@ -266,35 +269,41 @@ export default function BulkManagePage() {
             value={newItem.par}
             onChange={(event) => handleNewItemChange('par', event.target.value)}
             placeholder='Par'
-            className='rounded border border-gray-300 px-3 py-2 text-sm shadow-sm'
+            className='bulk-item-input'
           />
           <input
             value={newItem.unit}
             onChange={(event) =>
-              handleNewItemChange('unit', event.target.value)
+              handleNewItemChange(
+                'unit',
+                event.target.value.replaceAll(' ', '-').toLowerCase(),
+              )
             }
             placeholder='Unit'
-            className='rounded border border-gray-300 px-3 py-2 text-sm shadow-sm'
+            className='bulk-item-input'
           />
           <input
             value={newItem.category}
             onChange={(event) =>
-              handleNewItemChange('category', event.target.value)
+              handleNewItemChange(
+                'category',
+                event.target.value.replaceAll(' ', '-').toLowerCase(),
+              )
             }
             placeholder='Category'
-            className='rounded border border-gray-300 px-3 py-2 text-sm shadow-sm'
+            className='bulk-item-input'
           />
           <input
             value={newItem.location}
             onChange={(event) =>
-              handleNewItemChange('location', event.target.value)
+              handleNewItemChange(
+                'location',
+                event.target.value.replaceAll(' ', '-').toLowerCase(),
+              )
             }
             placeholder='Location'
-            className='rounded border border-gray-300 px-3 py-2 text-sm shadow-sm'
+            className='bulk-item-input'
           />
-        </div>
-
-        <div className='mt-4 flex justify-end'>
           <button
             type='button'
             onClick={handleAddItem}
@@ -304,19 +313,17 @@ export default function BulkManagePage() {
               !newItem.category ||
               !newItem.location
             }
-            className='rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300'>
+            className='add-item-bulk'>
             Add Item
           </button>
         </div>
       </div>
 
       <div className='overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm'>
-        <table className='min-w-full divide-y divide-gray-200 text-sm'>
+        <table className='min-w-full text-sm'>
           <thead className='bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-600'>
             <tr>
-              <th
-                className='cursor-pointer select-none px-3 py-3.5 hover:bg-gray-100'
-                onClick={() => handleSort('name')}>
+              <th className='table-header' onClick={() => handleSort('name')}>
                 Name{' '}
                 {sortConfig.field === 'name' &&
                   (sortConfig.direction === 'asc'
@@ -326,9 +333,9 @@ export default function BulkManagePage() {
                       : '')}
               </th>
               <th
-                className='cursor-pointer select-none px-3 py-3.5 hover:bg-gray-100'
+                className='table-header'
                 onClick={() => handleSort('quantity')}>
-                Qty{' '}
+                Quantity{' '}
                 {sortConfig.field === 'quantity' &&
                   (sortConfig.direction === 'asc'
                     ? '↑'
@@ -336,9 +343,7 @@ export default function BulkManagePage() {
                       ? '↓'
                       : '')}
               </th>
-              <th
-                className='cursor-pointer select-none px-3 py-3.5 hover:bg-gray-100'
-                onClick={() => handleSort('par')}>
+              <th className='table-header' onClick={() => handleSort('par')}>
                 Par{' '}
                 {sortConfig.field === 'par' &&
                   (sortConfig.direction === 'asc'
@@ -347,9 +352,7 @@ export default function BulkManagePage() {
                       ? '↓'
                       : '')}
               </th>
-              <th
-                className='cursor-pointer select-none px-3 py-3.5 hover:bg-gray-100'
-                onClick={() => handleSort('unit')}>
+              <th className='table-header' onClick={() => handleSort('unit')}>
                 Unit{' '}
                 {sortConfig.field === 'unit' &&
                   (sortConfig.direction === 'asc'
@@ -359,7 +362,7 @@ export default function BulkManagePage() {
                       : '')}
               </th>
               <th
-                className='cursor-pointer select-none px-3 py-3.5 hover:bg-gray-100'
+                className='table-header'
                 onClick={() => handleSort('category')}>
                 Category{' '}
                 {sortConfig.field === 'category' &&
@@ -370,7 +373,7 @@ export default function BulkManagePage() {
                       : '')}
               </th>
               <th
-                className='cursor-pointer select-none px-3 py-3.5 hover:bg-gray-100'
+                className='table-header'
                 onClick={() => handleSort('location')}>
                 Location{' '}
                 {sortConfig.field === 'location' &&
@@ -381,7 +384,7 @@ export default function BulkManagePage() {
                       : '')}
               </th>
               <th
-                className='cursor-pointer select-none px-3 py-3.5 hover:bg-gray-100'
+                className='table-header'
                 onClick={() => handleSort('lastUpdated')}>
                 Updated{' '}
                 {sortConfig.field === 'lastUpdated' &&
@@ -391,22 +394,26 @@ export default function BulkManagePage() {
                       ? '↓'
                       : '')}
               </th>
-              <th className='cursor-pointer select-none px-3 py-3.5 hover:bg-gray-100'></th>
+              <th className='table-header'></th>
             </tr>
           </thead>
-          <tbody className='divide-y divide-gray-200'>
+          <tbody className=''>
             {sortedItems.map((item) => (
-              <tr key={item.id}>
-                <td className='px-3 py-3'>
+              <tr className='table-item' key={item.id}>
+                <td className='bulk-item'>
                   <input
                     value={item.name}
                     onChange={(event) =>
-                      setItemValue(item.id, 'name', event.target.value)
+                      setItemValue(
+                        item.id,
+                        'name',
+                        event.target.value.replaceAll(' ', '-').toLowerCase(),
+                      )
                     }
-                    className='w-full rounded border border-gray-300 px-2 py-1 text-sm'
+                    className='bulk-item-input'
                   />
                 </td>
-                <td className='px-3 py-3'>
+                <td className='bulk-item'>
                   <input
                     type='number'
                     min='0'
@@ -414,10 +421,10 @@ export default function BulkManagePage() {
                     onChange={(event) =>
                       setItemValue(item.id, 'quantity', event.target.value)
                     }
-                    className='w-full rounded border border-gray-300 px-2 py-1 text-sm'
+                    className='bulk-item-input'
                   />
                 </td>
-                <td className='px-3 py-3'>
+                <td className='bulk-item'>
                   <input
                     type='number'
                     min='0'
@@ -425,44 +432,56 @@ export default function BulkManagePage() {
                     onChange={(event) =>
                       setItemValue(item.id, 'par', event.target.value)
                     }
-                    className='w-full rounded border border-gray-300 px-2 py-1 text-sm'
+                    className='bulk-item-input'
                   />
                 </td>
-                <td className='px-3 py-3'>
+                <td className='bulk-item'>
                   <input
                     value={item.unit}
                     onChange={(event) =>
-                      setItemValue(item.id, 'unit', event.target.value)
+                      setItemValue(
+                        item.id,
+                        'unit',
+                        event.target.value.replaceAll(' ', '-').toLowerCase(),
+                      )
                     }
-                    className='w-full rounded border border-gray-300 px-2 py-1 text-sm'
+                    className='bulk-item-input'
                   />
                 </td>
-                <td className='px-3 py-3'>
+                <td className='bulk-item'>
                   <input
                     value={item.category}
                     onChange={(event) =>
-                      setItemValue(item.id, 'category', event.target.value)
+                      setItemValue(
+                        item.id,
+                        'category',
+                        event.target.value.replaceAll(' ', '-').toLowerCase(),
+                      )
                     }
-                    className='w-full rounded border border-gray-300 px-2 py-1 text-sm'
+                    className='bulk-item-input'
                   />
                 </td>
-                <td className='px-3 py-3'>
+                <td className='bulk-item'>
                   <input
                     value={item.location}
                     onChange={(event) =>
-                      setItemValue(item.id, 'location', event.target.value)
+                      setItemValue(
+                        item.id,
+                        'location',
+                        event.target.value.replaceAll(' ', '-').toLowerCase(),
+                      )
                     }
-                    className='w-full rounded border border-gray-300 px-2 py-1 text-sm'
+                    className='bulk-item-input'
                   />
                 </td>
-                <td className='whitespace-nowrap px-3 py-3 text-gray-500'>
+                <td className='whitespace-nowrap bulk-item last-updated'>
                   {item.lastUpdated.toLocaleDateString()}
                 </td>
-                <td className='px-3 py-3 text-right'>
+                <td className='bulk-item text-right'>
                   <button
                     onClick={() => handleDelete(item.id)}
                     type='button'
-                    className='hover:text-red-500 hover:cursor-pointer'>
+                    className='bin-icon'>
                     <RiDeleteBin7Line />
                   </button>
                 </td>

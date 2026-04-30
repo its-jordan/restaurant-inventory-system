@@ -54,15 +54,31 @@ export default function OrdersPage() {
           All items are at or above par.
         </div>
       ) : (
-        <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
+        <div className='reorder-grid'>
           {orderItems.map((item) => (
-            <div
-              key={item.id}
-              className='rounded-lg border border-gray-200 bg-white p-4 shadow-sm'>
-              <div className='mb-3 flex items-start justify-between gap-4'>
+            <div key={item.id} className='reorder-item-card'>
+              <div className='reorder-item-header'>
                 <div>
-                  <h2 className='text-lg font-semibold'>{item.name}</h2>
-                  <p className='text-sm text-gray-500'>{item.category}</p>
+                  <h2 className='text-lg font-semibold'>
+                    {item.name
+                      .replaceAll('-', ' ')
+                      .toLowerCase()
+                      .split(' ')
+                      .map(
+                        (word) => word.charAt(0).toUpperCase() + word.slice(1),
+                      )
+                      .join(' ')}
+                  </h2>
+                  <p className='text-sm text-gray-500'>
+                    {item.category
+                      .replaceAll('-', ' ')
+                      .toLowerCase()
+                      .split(' ')
+                      .map(
+                        (word) => word.charAt(0).toUpperCase() + word.slice(1),
+                      )
+                      .join(' ')}
+                  </p>
                 </div>
                 <span className='rounded-full bg-red-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-red-700'>
                   Reorder
@@ -73,7 +89,15 @@ export default function OrdersPage() {
                 <div className='flex items-center justify-between'>
                   <span className='font-medium'>Quantity</span>
                   <span>
-                    {item.quantity} {item.unit}
+                    {item.quantity}{' '}
+                    {item.unit
+                      .replaceAll('-', ' ')
+                      .toLowerCase()
+                      .split(' ')
+                      .map(
+                        (word) => word.charAt(0).toUpperCase() + word.slice(1),
+                      )
+                      .join(' ')}
                   </span>
                 </div>
                 <div className='flex items-center justify-between'>
@@ -86,7 +110,16 @@ export default function OrdersPage() {
                 </div>
                 <div className='flex items-center justify-between'>
                   <span className='font-medium'>Location</span>
-                  <span>{item.location}</span>
+                  <span>
+                    {item.location
+                      .replaceAll('-', ' ')
+                      .toLowerCase()
+                      .split(' ')
+                      .map(
+                        (word) => word.charAt(0).toUpperCase() + word.slice(1),
+                      )
+                      .join(' ')}
+                  </span>
                 </div>
                 <div className='text-xs text-gray-400'>
                   Last updated: {item.lastUpdated.toLocaleDateString()}
