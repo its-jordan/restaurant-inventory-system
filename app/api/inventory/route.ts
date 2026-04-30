@@ -48,9 +48,14 @@ export async function POST(request: Request) {
     await db.insert(inventoryTable).values(newItem);
     return Response.json(newItem, { status: 201 });
   } catch (error) {
-    console.error('Failed to create inventory item:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Failed to create inventory item:', errorMessage);
+    console.error('TURSO_CONNECTION_URL:', process.env.TURSO_CONNECTION_URL);
     return Response.json(
-      { error: 'Failed to create inventory item' },
+      {
+        error: 'Failed to create inventory item',
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined,
+      },
       { status: 500 },
     );
   }
@@ -73,9 +78,13 @@ export async function PUT(request: Request) {
 
     return Response.json(updatedItem);
   } catch (error) {
-    console.error('Failed to update inventory item:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Failed to update inventory item:', errorMessage);
     return Response.json(
-      { error: 'Failed to update inventory item' },
+      {
+        error: 'Failed to update inventory item',
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined,
+      },
       { status: 500 },
     );
   }
@@ -94,9 +103,13 @@ export async function DELETE(request: Request) {
 
     return Response.json({ success: true });
   } catch (error) {
-    console.error('Failed to delete inventory item:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Failed to delete inventory item:', errorMessage);
     return Response.json(
-      { error: 'Failed to delete inventory item' },
+      {
+        error: 'Failed to delete inventory item',
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined,
+      },
       { status: 500 },
     );
   }
