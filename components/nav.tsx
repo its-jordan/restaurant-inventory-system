@@ -28,13 +28,6 @@ export default function Nav() {
             className={`md:flex gap-6 ${isOpen ? 'block' : 'hidden'} absolute md:static top-16 left-0 right-0 bg-white md:bg-transparent p-4 md:p-0`}>
             <li>
               <Link
-                href='/inventory'
-                className='text-gray-700 hover:text-gray-900'>
-                Inventory
-              </Link>
-            </li>
-            <li>
-              <Link
                 href='/orders'
                 className='text-gray-700 hover:text-gray-900'>
                 Orders
@@ -45,11 +38,6 @@ export default function Nav() {
                 href='/bulk-manage'
                 className='text-gray-700 hover:text-gray-900'>
                 Bulk Manage
-              </Link>
-            </li>
-            <li>
-              <Link href='/map' className='text-gray-700 hover:text-gray-900'>
-                Map
               </Link>
             </li>
             <li>

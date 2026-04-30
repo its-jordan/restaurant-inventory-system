@@ -6,6 +6,7 @@
   --muted: #64748b;
   --surface: #ffffff;
   --surface-muted: #f8fafc;
+  --modifier: #000000;
   --border: #e2e8f0;
   --primary: #2563eb;
   --primary-dark: #1d4ed8;
@@ -23,17 +24,18 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0b1220;
+    --background: #111111;
     --foreground: #e2e8f0;
     --muted: #94a3b8;
-    --surface: #111827;
-    --surface-muted: #111827;
-    --border: #334155;
-    --primary: #3b82f6;
-    --primary-dark: #2563eb;
-    --danger: #f87171;
-    --danger-bg: #831843;
-    --success-bg: #134e4a;
+    --surface: #292929;
+    --surface-muted: #161616;
+    --modifier: #ffffff;
+    --border: #2c2c2c;
+    --primary: #797979;
+    --primary-dark: #3f3f3f;
+    --danger: #ec5a5a;
+    --danger-bg: #5c243a;
+    --success-bg: #2c8524;
   }
 }
 
@@ -86,4 +88,67 @@ body {
 
 .bg-gray-200 {
   background-color: var(--border) !important;
+}
+
+/* General */
+
+.flex-start {
+  display: flex;
+  align-items: start;
+  justify-content: start;
+  gap: 1rem;
+  flex-flow: row wrap;
+}
+
+.page-header {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.item-header {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+/* Home */
+
+/* Item Card */
+
+.item-card {
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background-color: color-mix(in srgb, var(--surface), var(--modifier) 1%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s ease;
+}
+.item-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.add-item {
+  border: 1px dashed var(--border);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background-color: color-mix(in srgb, var(--surface), var(--modifier) 1%);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.add-item:hover {
+  background-color: color-mix(in srgb, var(--surface), var(--modifier) 5%);
+}
+.add-input {
+  font-size: 0.875rem;
+  & > input {
+    background-color: color-mix(in srgb, var(--surface), var(--modifier) 2%);
+    padding: 0.25rem;
+    border: 1px solid var(--border);
+    border-radius: 0.25rem;
+  }
+}
+
+.quantity-container {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: start;
+  align-items: center;
 }

@@ -60,17 +60,32 @@ export const ItemCard: React.FC<ItemCardProps> = ({
   };
 
   return (
-    <div className='border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow'>
+    <div
+      className={
+        'item-card' + (item.location !== null ? ' ' + item.location : '')
+      }>
       <div className='flex justify-between items-start mb-3'>
         <div className='space-y-1'>
           {isEditing ? (
             <input
               value={draft.name}
-              onChange={(event) => updateDraft('name', event.target.value)}
+              onChange={(event) =>
+                updateDraft(
+                  'name',
+                  event.target.value.replaceAll(' ', '-').toLowerCase(),
+                )
+              }
               className='w-full rounded border px-2 py-1 text-lg font-semibold'
             />
           ) : (
-            <h3 className='font-semibold text-lg'>{item.name}</h3>
+            <h3 className='font-semibold text-lg'>
+              {item.name
+                .replaceAll('-', ' ')
+                .toLowerCase()
+                .split(' ')
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ')}
+            </h3>
           )}
           {isEditing ? (
             <input
@@ -120,11 +135,23 @@ export const ItemCard: React.FC<ItemCardProps> = ({
           {isEditing ? (
             <input
               value={draft.unit}
-              onChange={(event) => updateDraft('unit', event.target.value)}
+              onChange={(event) =>
+                updateDraft(
+                  'unit',
+                  event.target.value.replaceAll(' ', '-').toLowerCase(),
+                )
+              }
               className='mt-2 w-full rounded border px-2 py-1 text-sm text-gray-700'
             />
           ) : (
-            <div className='text-sm text-gray-600'>{item.unit}</div>
+            <div className='text-sm text-gray-600'>
+              {item.unit
+                .replaceAll('-', ' ')
+                .toLowerCase()
+                .split(' ')
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ')}
+            </div>
           )}
         </div>
       </div>
@@ -135,13 +162,24 @@ export const ItemCard: React.FC<ItemCardProps> = ({
           {isEditing ? (
             <input
               value={draft.location}
-              onChange={(event) => updateDraft('location', event.target.value)}
+              onChange={(event) =>
+                updateDraft(
+                  'location',
+                  event.target.value.replaceAll(' ', '-').toLowerCase(),
+                )
+              }
               className='w-full rounded border px-2 py-1 text-sm text-gray-700'
             />
           ) : (
             <div className='flex flex-row flex-nowrap justify-start'>
-              <div>Location:</div>
-              <div className='text-xs text-gray-400'>{item.location}</div>
+              <div className='text-xs text-gray-400'>
+                {item.location
+                  .replaceAll('-', ' ')
+                  .toLowerCase()
+                  .split(' ')
+                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                  .join(' ')}
+              </div>
             </div>
           )}
         </div>

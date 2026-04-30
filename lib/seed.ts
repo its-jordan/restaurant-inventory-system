@@ -22,19 +22,6 @@ async function createTables() {
       )
     `);
 
-    // Create zones table
-    await db.execute(sql`
-      CREATE TABLE IF NOT EXISTS zones (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        color TEXT NOT NULL,
-        top REAL NOT NULL,
-        left REAL NOT NULL,
-        width REAL NOT NULL,
-        height REAL NOT NULL
-      )
-    `);
-
     console.log('✅ Tables created or already exist');
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
