@@ -54,7 +54,8 @@ export async function POST(request: Request) {
     return Response.json(
       {
         error: 'Failed to create inventory item',
-        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined,
+        details:
+          process.env.NODE_ENV === 'development' ? errorMessage : undefined,
       },
       { status: 500 },
     );
@@ -83,7 +84,8 @@ export async function PUT(request: Request) {
     return Response.json(
       {
         error: 'Failed to update inventory item',
-        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined,
+        details:
+          process.env.NODE_ENV === 'development' ? errorMessage : undefined,
       },
       { status: 500 },
     );
@@ -108,7 +110,8 @@ export async function DELETE(request: Request) {
     return Response.json(
       {
         error: 'Failed to delete inventory item',
-        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined,
+        details:
+          process.env.NODE_ENV === 'development' ? errorMessage : undefined,
       },
       { status: 500 },
     );
