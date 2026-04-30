@@ -1,38 +1,46 @@
-import { createClient } from '@libsql/client';
-import { drizzle } from 'drizzle-orm/libsql';
-import { inventoryTable, zonesTable } from './schema';
+import { db } from './db';
+import { inventoryTable } from './schema';
+import { sql } from 'drizzle-orm';
 
-const client = createClient({
-  url: process.env.TURSO_CONNECTION_URL || 'file:inventory.db',
-  authToken: process.env.TURSO_AUTH_TOKEN,
-});
-
-const db = drizzle({ client });
-
-// Create tables
+// Create tables if they don't exist
 async function createTables() {
-  await client.execute(`
-    CREATE TABLE IF NOT EXISTS inventory (
-      id INTEGER PRIMARY KEY,
-      name TEXT NOT NULL,
-      quantity INTEGER NOT NULL,
-      par INTEGER NOT NULL,
-      unit TEXT NOT NULL,
-      category TEXT NOT NULL,
-      location TEXT NOT NULL,
-      last_updated TEXT NOT NULL
-    );
+  try {
+    // Clear existing
+    console.log('📋 Creating tables...');
 
-    CREATE TABLE IF NOT EXISTS zones (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      color TEXT NOT NULL,
-      top REAL NOT NULL,
-      left REAL NOT NULL,
-      width REAL NOT NULL,
-      height REAL NOT NULL
-    );
-  `);
+    // Create inventory table
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS inventory (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        quantity INTEGER NOT NULL,
+        par INTEGER NOT NULL,
+        unit TEXT NOT NULL,
+        category TEXT NOT NULL,
+        location TEXT NOT NULL,
+        last_updated TEXT NOT NULL
+      )
+    `);
+
+    // Create zones table
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS zones (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        color TEXT NOT NULL,
+        top REAL NOT NULL,
+        left REAL NOT NULL,
+        width REAL NOT NULL,
+        height REAL NOT NULL
+      )
+    `);
+
+    console.log('✅ Tables created or already exist');
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('⚠️  Could not create tables:', errorMessage);
+    // Continue anyway - tables might already exist
+  }
 }
 
 // Seed inventory data
@@ -99,126 +107,35 @@ const inventoryData = [
   },
 ];
 
-// Seed zones data
-const zonesData = [
-  {
-    id: 'dry-storage-l',
-    name: 'Dry Storage Left',
-    color: 'bg-yellow-100',
-    top: 10,
-    left: 10,
-    width: 30,
-    height: 35,
-  },
-  {
-    id: 'dry-storage-r',
-    name: 'Dry Storage Right',
-    color: 'bg-yellow-100',
-    top: 10,
-    left: 10,
-    width: 30,
-    height: 35,
-  },
-  {
-    id: 'janitorial-spices',
-    name: 'Janitorial & Spices',
-    color: 'bg-yellow-100',
-    top: 10,
-    left: 10,
-    width: 30,
-    height: 35,
-  },
-  {
-    id: 'walk-in-left',
-    name: 'Walk In Left',
-    color: 'bg-blue-100',
-    top: 10,
-    left: 50,
-    width: 40,
-    height: 35,
-  },
-  {
-    id: 'walk-in-right',
-    name: 'Walk In Right',
-    color: 'bg-green-100',
-    top: 10,
-    left: 50,
-    width: 40,
-    height: 35,
-  },
-  {
-    id: 'fish-cooler',
-    name: 'Fish Cooler',
-    color: 'bg-green-100',
-    top: 10,
-    left: 50,
-    width: 40,
-    height: 35,
-  },
-  {
-    id: 'freezer',
-    name: 'Freezer',
-    color: 'bg-cyan-100',
-    top: 50,
-    left: 50,
-    width: 40,
-    height: 35,
-  },
-];
-
 // Clear existing data and seed database
 async function seedDatabase() {
   try {
+    console.log('🌱 Starting database seed...');
+
+    // Create tables first
     await createTables();
 
-    await client.execute('DELETE FROM inventory');
-    await client.execute('DELETE FROM zones');
+    // Clear existing data
+    try {
+      await db.delete(inventoryTable);
+      console.log('🗑️  Cleared existing data');
+    } catch (error) {
+      console.log('ℹ️  No existing data to clear');
+    }
 
     // Insert inventory data
     for (const item of inventoryData) {
-      await client.execute({
-        sql: `
-          INSERT INTO inventory (id, name, quantity, par, unit, category, location, last_updated)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `,
-        args: [
-          item.id,
-          item.name,
-          item.quantity,
-          item.par,
-          item.unit,
-          item.category,
-          item.location,
-          item.lastUpdated,
-        ],
-      });
+      await db.insert(inventoryTable).values(item);
     }
-
-    // Insert zones data
-    for (const zone of zonesData) {
-      await client.execute({
-        sql: `
-          INSERT INTO zones (id, name, color, top, left, width, height)
-          VALUES (?, ?, ?, ?, ?, ?, ?)
-        `,
-        args: [
-          zone.id,
-          zone.name,
-          zone.color,
-          zone.top,
-          zone.left,
-          zone.width,
-          zone.height,
-        ],
-      });
-    }
+    console.log(`✅ Seeded ${inventoryData.length} inventory items`);
 
     console.log('✅ Database seeded successfully!');
+    process.exit(0);
   } catch (error) {
-    console.error('❌ Error seeding database:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('❌ Error seeding database:', errorMessage);
+    console.error(error);
     process.exit(1);
-  } finally {
-    await client.close();
   }
 }
 
