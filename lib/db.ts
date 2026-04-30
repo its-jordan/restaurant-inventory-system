@@ -1,8 +1,14 @@
-import Database from 'better-sqlite3';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
+import { createClient } from '@libsql/client';
+import { drizzle } from 'drizzle-orm/libsql';
 import * as schema from './schema';
 
-const sqlite = new Database('inventory.db');
-export const db = drizzle(sqlite, { schema });
+// For Vercel/Turso, use environment variables
+// For local development, use file-based SQLite
+const client = createClient({
+  url: process.env.TURSO_CONNECTION_URL || 'file:inventory.db',
+  authToken: process.env.TURSO_AUTH_TOKEN,
+});
+
+export const db = drizzle({ client, schema });
 
 export default db;

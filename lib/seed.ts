@@ -1,33 +1,39 @@
-import Database from 'better-sqlite3';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
+import { createClient } from '@libsql/client';
+import { drizzle } from 'drizzle-orm/libsql';
 import { inventoryTable, zonesTable } from './schema';
 
-const sqlite = new Database('inventory.db');
-const db = drizzle(sqlite);
+const client = createClient({
+  url: process.env.TURSO_CONNECTION_URL || 'file:inventory.db',
+  authToken: process.env.TURSO_AUTH_TOKEN,
+});
+
+const db = drizzle({ client });
 
 // Create tables
-sqlite.exec(`
-  CREATE TABLE IF NOT EXISTS inventory (
-    id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-    quantity INTEGER NOT NULL,
-    par INTEGER NOT NULL,
-    unit TEXT NOT NULL,
-    category TEXT NOT NULL,
-    location TEXT NOT NULL,
-    last_updated TEXT NOT NULL
-  );
+async function createTables() {
+  await client.execute(`
+    CREATE TABLE IF NOT EXISTS inventory (
+      id INTEGER PRIMARY KEY,
+      name TEXT NOT NULL,
+      quantity INTEGER NOT NULL,
+      par INTEGER NOT NULL,
+      unit TEXT NOT NULL,
+      category TEXT NOT NULL,
+      location TEXT NOT NULL,
+      last_updated TEXT NOT NULL
+    );
 
-  CREATE TABLE IF NOT EXISTS zones (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    color TEXT NOT NULL,
-    top REAL NOT NULL,
-    left REAL NOT NULL,
-    width REAL NOT NULL,
-    height REAL NOT NULL
-  );
-`);
+    CREATE TABLE IF NOT EXISTS zones (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      color TEXT NOT NULL,
+      top REAL NOT NULL,
+      left REAL NOT NULL,
+      width REAL NOT NULL,
+      height REAL NOT NULL
+    );
+  `);
+}
 
 // Seed inventory data
 const inventoryData = [
@@ -160,45 +166,60 @@ const zonesData = [
   },
 ];
 
-// Clear existing data
-sqlite.exec('DELETE FROM inventory; DELETE FROM zones;');
+// Clear existing data and seed database
+async function seedDatabase() {
+  try {
+    await createTables();
 
-// Insert inventory data
-const inventoryInsert = sqlite.prepare(`
-  INSERT INTO inventory (id, name, quantity, par, unit, category, location, last_updated)
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-`);
+    await client.execute('DELETE FROM inventory');
+    await client.execute('DELETE FROM zones');
 
-for (const item of inventoryData) {
-  inventoryInsert.run(
-    item.id,
-    item.name,
-    item.quantity,
-    item.par,
-    item.unit,
-    item.category,
-    item.location,
-    item.lastUpdated,
-  );
+    // Insert inventory data
+    for (const item of inventoryData) {
+      await client.execute({
+        sql: `
+          INSERT INTO inventory (id, name, quantity, par, unit, category, location, last_updated)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `,
+        args: [
+          item.id,
+          item.name,
+          item.quantity,
+          item.par,
+          item.unit,
+          item.category,
+          item.location,
+          item.lastUpdated,
+        ],
+      });
+    }
+
+    // Insert zones data
+    for (const zone of zonesData) {
+      await client.execute({
+        sql: `
+          INSERT INTO zones (id, name, color, top, left, width, height)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+        `,
+        args: [
+          zone.id,
+          zone.name,
+          zone.color,
+          zone.top,
+          zone.left,
+          zone.width,
+          zone.height,
+        ],
+      });
+    }
+
+    console.log('✅ Database seeded successfully!');
+  } catch (error) {
+    console.error('❌ Error seeding database:', error);
+    process.exit(1);
+  } finally {
+    await client.close();
+  }
 }
 
-// Insert zones data
-const zonesInsert = sqlite.prepare(`
-  INSERT INTO zones (id, name, color, top, left, width, height)
-  VALUES (?, ?, ?, ?, ?, ?, ?)
-`);
-
-for (const zone of zonesData) {
-  zonesInsert.run(
-    zone.id,
-    zone.name,
-    zone.color,
-    zone.top,
-    zone.left,
-    zone.width,
-    zone.height,
-  );
-}
-
-console.log('✅ Database seeded successfully!');
-sqlite.close();
+seedDatabase();
