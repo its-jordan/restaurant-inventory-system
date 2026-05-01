@@ -43,6 +43,7 @@ export default function Home() {
 
   const [categoryFilter, setCategoryFilter] = React.useState('All');
   const [locationFilter, setLocationFilter] = React.useState('All');
+  const [searchQuery, setSearchQuery] = React.useState('');
 
   const categories = React.useMemo(
     () => ['All', ...Array.from(new Set(items.map((item) => item.category)))],
@@ -61,9 +62,12 @@ export default function Home() {
           categoryFilter === 'All' || item.category === categoryFilter;
         const locationMatch =
           locationFilter === 'All' || item.location === locationFilter;
-        return categoryMatch && locationMatch;
+        const searchMatch =
+          searchQuery === '' ||
+          item.name.toLowerCase().includes(searchQuery.toLowerCase());
+        return categoryMatch && locationMatch && searchMatch;
       }),
-    [items, categoryFilter, locationFilter],
+    [items, categoryFilter, locationFilter, searchQuery],
   );
 
   const handleEdit = async (updatedItem: InventoryItem) => {
@@ -176,54 +180,67 @@ export default function Home() {
   };
 
   return (
-    <div className='p-6'>
+    <div className='page-content'>
       <h1 className='page-header'>Inventory</h1>
       <div className='mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between'>
-        <div>
+        <div className='flex-1'>
           <p className='text-sm text-gray-500'>
-            Filter by category and location
+            Search and filter by category and location
           </p>
-          <div className='mt-2 flex flex-col gap-3 sm:flex-row'>
-            <label className='flex flex-col gap-1 text-sm'>
-              Category
-              <select
-                value={categoryFilter}
-                onChange={(event) => setCategoryFilter(event.target.value)}
-                className='rounded border px-3 py-2 text-sm'>
-                {categories.map((category) => (
-                  <option key={category} value={category}>
-                    {category
-                      .replaceAll('-', ' ')
-                      .toLowerCase()
-                      .split(' ')
-                      .map(
-                        (word) => word.charAt(0).toUpperCase() + word.slice(1),
-                      )
-                      .join(' ')}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className='flex flex-col gap-1 text-sm'>
-              Location
-              <select
-                value={locationFilter}
-                onChange={(event) => setLocationFilter(event.target.value)}
-                className='rounded border px-3 py-2 text-sm'>
-                {locations.map((location) => (
-                  <option key={location} value={location}>
-                    {location
-                      .replaceAll('-', ' ')
-                      .toLowerCase()
-                      .split(' ')
-                      .map(
-                        (word) => word.charAt(0).toUpperCase() + word.slice(1),
-                      )
-                      .join(' ')}
-                  </option>
-                ))}
-              </select>
-            </label>
+          <div className='mt-2 flex flex-col gap-3'>
+            <div className='flex flex-col gap-3 sm:flex-row'>
+              <label className='flex flex-col gap-1 text-sm'>
+                Category
+                <select
+                  value={categoryFilter}
+                  onChange={(event) => setCategoryFilter(event.target.value)}
+                  className='rounded border px-3 py-2 text-sm'>
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category
+                        .replaceAll('-', ' ')
+                        .toLowerCase()
+                        .split(' ')
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() + word.slice(1),
+                        )
+                        .join(' ')}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className='flex flex-col gap-1 text-sm'>
+                Location
+                <select
+                  value={locationFilter}
+                  onChange={(event) => setLocationFilter(event.target.value)}
+                  className='rounded border px-3 py-2 text-sm'>
+                  {locations.map((location) => (
+                    <option key={location} value={location}>
+                      {location
+                        .replaceAll('-', ' ')
+                        .toLowerCase()
+                        .split(' ')
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() + word.slice(1),
+                        )
+                        .join(' ')}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className='flex flex-col gap-1 text-sm w-full mt-5'>
+                <input
+                  type='text'
+                  placeholder='Search items by name...'
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  className='rounded border px-3 py-2 text-sm w-full'
+                />
+              </label>
+            </div>
           </div>
         </div>
 

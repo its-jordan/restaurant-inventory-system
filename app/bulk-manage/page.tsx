@@ -29,6 +29,7 @@ export default function BulkManagePage() {
     location: '',
   });
   const [isLoaded, setIsLoaded] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState('');
   const [sortConfig, setSortConfig] = React.useState<{
     field: keyof InventoryItem | null;
     direction: 'asc' | 'desc' | null;
@@ -213,9 +214,15 @@ export default function BulkManagePage() {
   };
 
   const sortedItems = React.useMemo(() => {
-    if (!sortConfig.field || !sortConfig.direction) return items;
+    let filtered = items.filter(
+      (item) =>
+        searchQuery === '' ||
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    );
 
-    return [...items].sort((a, b) => {
+    if (!sortConfig.field || !sortConfig.direction) return filtered;
+
+    return filtered.sort((a, b) => {
       const aValue = a[sortConfig.field!];
       const bValue = b[sortConfig.field!];
 
@@ -231,16 +238,25 @@ export default function BulkManagePage() {
 
       return sortConfig.direction === 'asc' ? comparison : -comparison;
     });
-  }, [items, sortConfig]);
+  }, [items, sortConfig, searchQuery]);
 
   return (
-    <div className='p-6'>
-      <h1 className='text-3xl font-bold mb-2'>Bulk Manage</h1>
+    <div className='page-content'>
+      <h1 className='page-header'>Bulk Manage</h1>
       <p className='mb-6 text-sm text-gray-500'>
         Edit inventory in a compact table and add new entries quickly.
       </p>
 
       <div className='mb-6 rounded-lg border border-gray-200 bg-white p-4 shadow-sm'>
+        <div className='mb-4'>
+          <input
+            type='text'
+            placeholder='Search items by name...'
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            className='w-full rounded border px-3 py-2 text-sm'
+          />
+        </div>
         <div className='grid gap-3 lg:grid-cols-7'>
           <input
             value={newItem.name}
@@ -333,7 +349,7 @@ export default function BulkManagePage() {
                       : '')}
               </th>
               <th
-                className='table-header'
+                className='table-header number-column'
                 onClick={() => handleSort('quantity')}>
                 Quantity{' '}
                 {sortConfig.field === 'quantity' &&
@@ -343,7 +359,9 @@ export default function BulkManagePage() {
                       ? '↓'
                       : '')}
               </th>
-              <th className='table-header' onClick={() => handleSort('par')}>
+              <th
+                className='table-header number-column'
+                onClick={() => handleSort('par')}>
                 Par{' '}
                 {sortConfig.field === 'par' &&
                   (sortConfig.direction === 'asc'

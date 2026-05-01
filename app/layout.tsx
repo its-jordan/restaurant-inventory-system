@@ -1,15 +1,11 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Rubik } from 'next/font/google';
 import './globals.css';
 import Nav from '@/components/nav';
+import ThemeProvider from '@/components/theme-provider';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const rubik = Rubik({
+  variable: '--font-rubik',
   subsets: ['latin'],
 });
 
@@ -24,13 +20,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang='en'
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className='min-h-full flex flex-col'>
-        <Nav />
-        {children}
-      </body>
+    <html lang='en' className={`${rubik.variable} h-full antialiased`}>
+      <ThemeProvider>
+        <body className='min-h-full flex flex-col'>
+          <Nav />
+          {children}
+        </body>
+      </ThemeProvider>
     </html>
   );
 }

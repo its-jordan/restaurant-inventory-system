@@ -7,14 +7,12 @@ export default function Nav() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className='bg-white shadow-md'>
-      <div className='max-w-7xl mx-auto px-4'>
+    <nav className=''>
+      <div className=''>
         <div className='flex justify-between items-center h-16'>
-          <Link
-            href='/'
-            className='text-xl font-bold text-gray-800 flex flex-row items-start gap-2'>
-            <div className='font-bold text-red-500'>Little Bar</div>
-            Inventory Management
+          <Link href='/' className='site-logo'>
+            <div>Little Bar</div>
+            <div>Inventory Management</div>
           </Link>
 
           <button

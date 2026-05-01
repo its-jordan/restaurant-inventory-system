@@ -43,8 +43,8 @@ export default function OrdersPage() {
   const orderItems = inventory.filter((item) => item.quantity < item.par);
 
   return (
-    <div className='p-6'>
-      <h1 className='text-3xl font-bold mb-4'>Orders</h1>
+    <div className='page-content'>
+      <h1 className='page-header'>Orders</h1>
       <p className='mb-6 text-sm text-gray-500'>
         Items that need to be reordered because current quantity is below par.
       </p>
@@ -85,9 +85,9 @@ export default function OrdersPage() {
                 </span>
               </div>
 
-              <div className='space-y-2 text-sm text-gray-700'>
-                <div className='flex items-center justify-between'>
-                  <span className='font-medium'>Quantity</span>
+              <div className='reorder-item-details'>
+                <div className='reorder-item-detail-row'>
+                  <span className=''>Quantity</span>
                   <span>
                     {item.quantity}{' '}
                     {item.unit
@@ -100,16 +100,16 @@ export default function OrdersPage() {
                       .join(' ')}
                   </span>
                 </div>
-                <div className='flex items-center justify-between'>
-                  <span className='font-medium'>Par</span>
+                <div className='reorder-item-detail-row'>
+                  <span className=''>Par</span>
                   <span>{item.par}</span>
                 </div>
-                <div className='flex items-center justify-between'>
-                  <span className='font-medium'>Need to order</span>
+                <div className='reorder-item-detail-row'>
+                  <span className=''>Need to order</span>
                   <span>{item.par - item.quantity}</span>
                 </div>
-                <div className='flex items-center justify-between'>
-                  <span className='font-medium'>Location</span>
+                <div className='reorder-item-detail-row'>
+                  <span className=''>Location</span>
                   <span>
                     {item.location
                       .replaceAll('-', ' ')
@@ -121,7 +121,7 @@ export default function OrdersPage() {
                       .join(' ')}
                   </span>
                 </div>
-                <div className='text-xs text-gray-400'>
+                <div className='reorder-item-detail-date'>
                   Last updated: {item.lastUpdated.toLocaleDateString()}
                 </div>
               </div>
